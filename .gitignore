@@ -1,1 +1,7 @@
 .idea/
+input/train/*
+input/testing/*
+input/validation/*
+!input/train/*.txt
+!input/testing/*.txt
+!input/validation/*.txt

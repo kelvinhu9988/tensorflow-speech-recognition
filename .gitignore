@@ -2,3 +2,4 @@
 input/train/audio/*
 input/testing/audio/*
 input/validation/audio/*
+!input/train/.gitkeep

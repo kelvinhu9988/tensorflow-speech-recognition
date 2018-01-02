@@ -414,8 +414,7 @@ def create_low_latency_svdf_model(fingerprint_input, model_settings,
   Args:
     fingerprint_input: TensorFlow node that will output audio feature vectors.
     The node is expected to produce a 2D Tensor of shape:
-      [batch, model_settings['dct_coefficient_count'] *
-              model_settings['spectrogram_length']]
+      [batch, model_settings['dct_coefficient_count'] * model_settings['spectrogram_length']]
     with the features corresponding to the same time slot arranged contiguously,
     and the oldest slot at index [:, 0], and newest at [:, -1].
     model_settings: Dictionary of information about the model.
@@ -423,8 +422,7 @@ def create_low_latency_svdf_model(fingerprint_input, model_settings,
     runtime_settings: Dictionary of information about the runtime.
 
   Returns:
-    TensorFlow node outputting logits results, and optionally a dropout
-    placeholder.
+    TensorFlow node outputting logits results, and optionally a dropout placeholder.
 
   Raises:
       ValueError: If the inputs tensor is incorrectly shaped.

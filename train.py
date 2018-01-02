@@ -36,35 +36,34 @@ def main(_):
   # Start a new TensorFlow session.
   sess = tf.InteractiveSession()
 
-  # Begin by making sure we have the training data we need. If you already have
-  # training data of your own, use `--data_url= ` on the command line to avoid
-  # downloading.
+  # Begin by making sure we have the training data we need.
   model_settings = models.prepare_model_settings(
       len(input_data.prepare_words_list(FLAGS.wanted_words.split(','))),
       FLAGS.sample_rate, FLAGS.clip_duration_ms, FLAGS.window_size_ms,
       FLAGS.window_stride_ms, FLAGS.dct_coefficient_count)
   audio_processor = input_data.AudioProcessor(
-      FLAGS.data_url, FLAGS.data_dir, FLAGS.silence_percentage,
+      FLAGS.data_dir, FLAGS.silence_percentage,
       FLAGS.unknown_percentage,
       FLAGS.wanted_words.split(','), FLAGS.validation_percentage,
       FLAGS.testing_percentage, model_settings)
   fingerprint_size = model_settings['fingerprint_size']
   label_count = model_settings['label_count']
   time_shift_samples = int((FLAGS.time_shift_ms * FLAGS.sample_rate) / 1000)
-  # Figure out the learning rates for each training phase. Since it's often
-  # effective to have high learning rates at the start of training, followed by
-  # lower levels towards the end, the number of steps and learning rates can be
-  # specified as comma-separated lists to define the rate at each stage. For
-  # example --how_many_training_steps=10000,3000 --learning_rate=0.001,0.0001
+
+  # Figure out the learning rates for each training phase.
+  # Since it's often effective to have high learning rates at the start of training,
+  # followed by lower levels towards the end, the number of steps and learning rates can be
+  # specified as comma-separated lists to define the rate at each stage.
+  # For example --how_many_training_steps=10000,3000 --learning_rate=0.001,0.0001
   # will run 13,000 training loops in total, with a rate of 0.001 for the first
   # 10,000, and 0.0001 for the final 3,000.
   training_steps_list = list(map(int, FLAGS.how_many_training_steps.split(',')))
   learning_rates_list = list(map(float, FLAGS.learning_rate.split(',')))
+
   if len(training_steps_list) != len(learning_rates_list):
     raise Exception(
-        '--how_many_training_steps and --learning_rate must be equal length '
-        'lists, but are %d and %d long instead' % (len(training_steps_list),
-                                                   len(learning_rates_list)))
+        '--how_many_training_steps and --learning_rate must be equal length lists, ' 
+        'but are %d and %d long instead' % (len(training_steps_list), len(learning_rates_list)))
 
   fingerprint_input = tf.placeholder(
       tf.float32, [None, fingerprint_size], name='fingerprint_input')
@@ -110,8 +109,7 @@ def main(_):
 
   # Merge all the summaries and write them out to /tmp/retrain_logs (by default)
   merged_summaries = tf.summary.merge_all()
-  train_writer = tf.summary.FileWriter(FLAGS.summaries_dir + '/train',
-                                       sess.graph)
+  train_writer = tf.summary.FileWriter(FLAGS.summaries_dir + '/train', sess.graph)
   validation_writer = tf.summary.FileWriter(FLAGS.summaries_dir + '/validation')
 
   tf.global_variables_initializer().run()
@@ -144,10 +142,12 @@ def main(_):
       if training_step <= training_steps_sum:
         learning_rate_value = learning_rates_list[i]
         break
+
     # Pull the audio samples we'll use for training.
     train_fingerprints, train_ground_truth = audio_processor.get_data(
         FLAGS.batch_size, 0, model_settings, FLAGS.background_frequency,
         FLAGS.background_volume, time_shift_samples, 'training', sess)
+
     # Run the graph with this batch of training data.
     train_summary, train_accuracy, cross_entropy_value, _, _ = sess.run(
         [
@@ -162,19 +162,18 @@ def main(_):
         })
     train_writer.add_summary(train_summary, training_step)
     tf.logging.info('Step #%d: rate %f, accuracy %.1f%%, cross entropy %f' %
-                    (training_step, learning_rate_value, train_accuracy * 100,
-                     cross_entropy_value))
+                    (training_step, learning_rate_value, train_accuracy * 100, cross_entropy_value))
+
     is_last_step = (training_step == training_steps_max)
     if (training_step % FLAGS.eval_step_interval) == 0 or is_last_step:
       set_size = audio_processor.set_size('validation')
       total_accuracy = 0
       total_conf_matrix = None
       for i in xrange(0, set_size, FLAGS.batch_size):
-        validation_fingerprints, validation_ground_truth = (
-            audio_processor.get_data(FLAGS.batch_size, i, model_settings, 0.0,
-                                     0.0, 0, 'validation', sess))
-        # Run a validation step and capture training summaries for TensorBoard
-        # with the `merged` op.
+        validation_fingerprints, validation_ground_truth = audio_processor.get_data(
+            FLAGS.batch_size, i, model_settings, 0.0, 0.0, 0, 'validation', sess)
+
+        # Run a validation step and capture training summaries for TensorBoard with the `merged` op.
         validation_summary, validation_accuracy, conf_matrix = sess.run(
             [merged_summaries, evaluation_step, confusion_matrix],
             feed_dict={
@@ -189,9 +188,8 @@ def main(_):
           total_conf_matrix = conf_matrix
         else:
           total_conf_matrix += conf_matrix
-      tf.logging.info('Confusion Matrix:\n %s' % (total_conf_matrix))
-      tf.logging.info('Step %d: Validation accuracy = %.1f%% (N=%d)' %
-                      (training_step, total_accuracy * 100, set_size))
+      tf.logging.info('Confusion Matrix:\n %s' % total_conf_matrix)
+      tf.logging.info('Step %d: Validation accuracy = %.1f%% (N=%d)' % (training_step, total_accuracy * 100, set_size))
 
     # Save the model checkpoint periodically.
     if training_step % FLAGS.save_step_interval == 0 or training_step == training_steps_max:
@@ -229,7 +227,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--data_dir',
       type=str,
-      default='/tmp/speech_dataset/',
+      default='/tmp/speech_dataset',
       help='Where to download the speech training data to.')
   parser.add_argument(
       '--background_volume',

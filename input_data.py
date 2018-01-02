@@ -144,7 +144,7 @@ def save_wav_file(filename, wav_data, sample_rate):
 class AudioProcessor(object):
   """Handles loading, partitioning, and preparing audio training data."""
 
-  def __init__(self, data_url, data_dir, silence_percentage, unknown_percentage,
+  def __init__(self, data_dir, silence_percentage, unknown_percentage,
                wanted_words, validation_percentage, testing_percentage,
                model_settings):
     self.data_dir = data_dir

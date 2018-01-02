@@ -1,3 +1,4 @@
+__pycache__/*
 .idea/
 input/train/audio/*
 input/testing/audio/*

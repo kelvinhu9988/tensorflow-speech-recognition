@@ -302,7 +302,7 @@ class AudioProcessor(object):
       - time_shift_offset_placeholder_: How much to move the clip in time.
       - background_data_placeholder_: PCM sample data for background noise.
       - background_volume_placeholder_: Loudness of mixed-in background.
-      - mfcc_: Output 2D fingerprint of processed audio.
+      - mfcc_: 2D fingerprint of processed audio.
 
     Args:
       model_settings: Information about the current model being trained.
@@ -366,16 +366,13 @@ class AudioProcessor(object):
     validation always uses the same samples, reducing noise in the metrics.
 
     Args:
-      how_many: Desired number of samples to return. -1 means the entire
-        contents of this partition.
+      how_many: Desired number of samples to return. -1 means the entire contents of this partition.
       offset: Where to start when fetching deterministically.
       model_settings: Information about the current model being trained.
-      background_frequency: How many clips will have background noise, 0.0 to
-        1.0.
+      background_frequency: How many clips will have background noise, 0.0 to 1.0.
       background_volume_range: How loud the background noise will be.
       time_shift: How much to randomly shift the clips by in time.
-      mode: Which partition to use, must be 'training', 'validation', or
-        'testing'.
+      mode: Which partition to use, must be 'training', 'validation', or 'testing'.
       sess: TensorFlow session that was active when processor was created.
 
     Returns:

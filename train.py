@@ -128,8 +128,7 @@ def main(_):
 
   # Save list of words.
   with gfile.GFile(
-      os.path.join(FLAGS.train_dir, FLAGS.model_architecture + '_labels.txt'),
-      'w') as f:
+          os.path.join(FLAGS.train_dir, FLAGS.model_architecture + '_labels.txt'), 'w') as f:
     f.write('\n'.join(audio_processor.words_list))
 
   # Training loop.
@@ -148,6 +147,9 @@ def main(_):
         FLAGS.batch_size, 0, model_settings, FLAGS.background_frequency,
         FLAGS.background_volume, time_shift_samples, 'training', sess)
 
+    print(len(train_fingerprints))
+    sys.exit(1)
+
     # Run the graph with this batch of training data.
     train_summary, train_accuracy, cross_entropy_value, _, _ = sess.run(
         [
@@ -164,6 +166,8 @@ def main(_):
     tf.logging.info('Step #%d: rate %f, accuracy %.1f%%, cross entropy %f' %
                     (training_step, learning_rate_value, train_accuracy * 100, cross_entropy_value))
 
+
+    # Output the confusion matrix and validation accuracy periodically
     is_last_step = (training_step == training_steps_max)
     if (training_step % FLAGS.eval_step_interval) == 0 or is_last_step:
       set_size = audio_processor.set_size('validation')
@@ -198,6 +202,7 @@ def main(_):
       tf.logging.info('Saving to "%s-%d"', checkpoint_path, training_step)
       saver.save(sess, checkpoint_path, global_step=training_step)
 
+  # Testing loop.
   set_size = audio_processor.set_size('testing')
   tf.logging.info('set_size=%d', set_size)
   total_accuracy = 0
@@ -228,7 +233,7 @@ if __name__ == '__main__':
       '--data_dir',
       type=str,
       default='/tmp/speech_dataset',
-      help='Where to download the speech training data to.')
+      help='Where the training data folder is.')
   parser.add_argument(
       '--background_volume',
       type=float,
@@ -283,7 +288,7 @@ if __name__ == '__main__':
       '--window_stride_ms',
       type=float,
       default=10.0,
-      help='How long each spectrogram timeslice is',)
+      help='How long the stride between frequency windows is',)
   parser.add_argument(
       '--dct_coefficient_count',
       type=int,

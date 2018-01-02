@@ -36,7 +36,9 @@ def prepare_model_settings(label_count, sample_rate, clip_duration_ms,
   desired_samples = int(sample_rate * clip_duration_ms / 1000)
   window_size_samples = int(sample_rate * window_size_ms / 1000)
   window_stride_samples = int(sample_rate * window_stride_ms / 1000)
-  length_minus_window = (desired_samples - window_size_samples)
+  length_minus_window = desired_samples - window_size_samples
+
+  # spectrogram_length: Number of frequency windows (spectrograms) sampled from a clip
   if length_minus_window < 0:
     spectrogram_length = 0
   else:
@@ -89,20 +91,21 @@ def create_model(fingerprint_input, model_settings, model_architecture,
     Exception: If the architecture type isn't recognized.
   """
   if model_architecture == 'single_fc':
-    return create_single_fc_model(fingerprint_input, model_settings,
-                                  is_training)
+    return create_single_fc_model(fingerprint_input,
+                                  model_settings, is_training)
   elif model_architecture == 'conv':
-    return create_conv_model(fingerprint_input, model_settings, is_training)
+    return create_conv_model(fingerprint_input,
+                             model_settings, is_training)
   elif model_architecture == 'low_latency_conv':
-    return create_low_latency_conv_model(fingerprint_input, model_settings,
-                                         is_training)
+    return create_low_latency_conv_model(fingerprint_input,
+                                         model_settings, is_training)
   elif model_architecture == 'low_latency_svdf':
-    return create_low_latency_svdf_model(fingerprint_input, model_settings,
-                                         is_training, runtime_settings)
+    return create_low_latency_svdf_model(fingerprint_input,
+                                         model_settings, is_training, runtime_settings)
   else:
     raise Exception('model_architecture argument "' + model_architecture +
-                    '" not recognized, should be one of "single_fc", "conv",' +
-                    ' "low_latency_conv, or "low_latency_svdf"')
+                    '" not recognized, should be one of "single_fc", "conv", ' +
+                    '"low_latency_conv", or "low_latency_svdf"')
 
 
 def load_variables_from_checkpoint(sess, start_checkpoint):

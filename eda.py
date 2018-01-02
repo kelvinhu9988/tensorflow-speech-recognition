@@ -6,7 +6,7 @@ Created on Sun Dec 17 19:34:07 2017
 @author: william
 """
 
-#   EDA and preprocessing
+# EDA and Preprocessing
 import os
 import numpy as np 
 import pandas as pd
@@ -22,12 +22,12 @@ from scipy.io import wavfile
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
 
-np.random.seed(1104) #  for consistency
+np.random.seed(1024)  # for consistency
 
-#---------------------------------------------------#
-#--------------   Data Labeling   ------------------#
-#---------------------------------------------------#
-train_audio_path = '../input/train/audio'
+# ---------------------------------------------------#
+# --------------   Data Labeling   ------------------#
+# ---------------------------------------------------#
+train_audio_path = 'input/train/audio'
 
 train_labels = os.listdir(train_audio_path)
 train_labels.remove('_background_noise_')

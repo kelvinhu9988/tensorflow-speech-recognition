@@ -91,14 +91,11 @@ def main(_):
         labels=ground_truth_input, logits=logits)
   tf.summary.scalar('cross_entropy', cross_entropy_mean)
   with tf.name_scope('train'), tf.control_dependencies(control_dependencies):
-    learning_rate_input = tf.placeholder(
-        tf.float32, [], name='learning_rate_input')
-    train_step = tf.train.GradientDescentOptimizer(
-        learning_rate_input).minimize(cross_entropy_mean)
+    learning_rate_input = tf.placeholder(tf.float32, [], name='learning_rate_input')
+    train_step = tf.train.GradientDescentOptimizer(learning_rate_input).minimize(cross_entropy_mean)
   predicted_indices = tf.argmax(logits, 1)
   correct_prediction = tf.equal(predicted_indices, ground_truth_input)
-  confusion_matrix = tf.confusion_matrix(
-      ground_truth_input, predicted_indices, num_classes=label_count)
+  confusion_matrix = tf.confusion_matrix(ground_truth_input, predicted_indices, num_classes=label_count)
   evaluation_step = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
   tf.summary.scalar('accuracy', evaluation_step)
 
@@ -147,8 +144,6 @@ def main(_):
         FLAGS.batch_size, 0, model_settings, FLAGS.background_frequency,
         FLAGS.background_volume, time_shift_samples, 'training', sess)
 
-    print(len(train_fingerprints))
-    sys.exit(1)
 
     # Run the graph with this batch of training data.
     train_summary, train_accuracy, cross_entropy_value, _, _ = sess.run(

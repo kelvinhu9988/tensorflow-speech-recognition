@@ -329,11 +329,9 @@ class AudioProcessor(object):
                                  [desired_samples, -1])
 
     # Mix in background noise.
-    self.background_data_placeholder_ = tf.placeholder(tf.float32,
-                                                       [desired_samples, 1])
+    self.background_data_placeholder_ = tf.placeholder(tf.float32, [desired_samples, 1])
     self.background_volume_placeholder_ = tf.placeholder(tf.float32, [])
-    background_mul = tf.multiply(self.background_data_placeholder_,
-                                 self.background_volume_placeholder_)
+    background_mul = tf.multiply(self.background_data_placeholder_, self.background_volume_placeholder_)
     background_add = tf.add(background_mul, sliced_foreground)
     background_clamp = tf.clip_by_value(background_add, -1.0, 1.0)
 
